@@ -1,0 +1,29 @@
+name: Build Kivy APK
+
+on:
+  push:
+    branches: [ "main", "master" ] # Aciona quando você envia código para o branch main ou master
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Build with Buildozer
+        uses: kivy/buildozer-action@v1
+        with:
+          build_dir: . # O diretório do seu projeto
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: package
+          path: ${{ steps.build.outputs.package_path }}/*.apk
