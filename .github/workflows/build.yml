@@ -9,22 +9,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Build with Buildozer
-        id: build
-        uses: kivy/buildozer-action@v1
-        with:
-          build_dir: .
-
+      - name: Build APK with Docker and Buildozer
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/app \
+            kivy/buildozer \
+            bash -c "sudo chown -R $(id -u):$(id -g) /app && cd /app && buildozer -v android debug"
+      
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: package
-          path: ${{ steps.build.outputs.package_path }}/*.apk
+          path: bin/*.apk
